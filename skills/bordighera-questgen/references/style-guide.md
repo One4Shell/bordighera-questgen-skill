@@ -59,8 +59,9 @@ narrativo con un arco completo:
 
 ## Cosa evitare
 
-- Non uscire mai dal contratto di output (nessun testo fuori dal JSON, vedi
-  `SKILL.md`).
+- Non uscire mai dal contratto di output: il risultato è il file
+  `masterquest.json` nella cartella corrente (vedi `SKILL.md`), senza testo
+  esterno.
 - Non introdurre campi non previsti dallo schema, anche se "utili" per la
   narrazione (es. campi come `story`, `chapter`, `difficulty` non esistono).
 - Non rendere gli `hint` troppo espliciti: devono richiedere osservazione,

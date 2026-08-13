@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """
-validate.py — valida una riga "masterquest output {...}" prodotta dalla
-skill bordighera-questgen rispetto allo schema atteso.
+validate.py — valida il file "masterquest.json" generato dalla skill
+bordighera-questgen rispetto allo schema atteso.
 
 Uso:
-    python3 validate.py path/to/output.txt
-    cat output.txt | python3 validate.py -
+    python3 validate.py path/to/masterquest.json
+    cat masterquest.json | python3 validate.py -
+
+Compatibilità: accetta sia il file JSON "puro" (oggetto MasterQuest diretto,
+senza wrapper) sia la vecchia forma con prefisso "masterquest output {...}".
 
 Esce con codice 0 se l'output è valido, 1 se ci sono errori (che vengono
 stampati su stderr, uno per riga).
@@ -68,11 +71,6 @@ def check_subquest(q, index, errors, seen_ids):
             fail(errors, f"{path}.id: '{qid}' duplicato")
         seen_ids.add(qid)
 
-    prefix_map = {"photo": "photo_", "word": "word_", "moving": "moving_"}
-    expected_prefix = prefix_map.get(qtype)
-    if expected_prefix and isinstance(qid, str) and not qid.startswith(expected_prefix):
-        fail(errors, f"{path}.id: atteso prefisso '{expected_prefix}' per tipo '{qtype}'")
-
     for f in ("name", "subtitle", "description", "hint"):
         if f in q:
             check_lang_obj(q[f], f"{path}.{f}", errors)
@@ -123,8 +121,8 @@ def check_master_quest(mq, errors):
             fail(errors, f"masterQuest: campo obbligatorio mancante '{field}'")
 
     mqid = mq.get("id", "")
-    if not isinstance(mqid, str) or not ID_RE.match(mqid) or not mqid.startswith("mq_"):
-        fail(errors, f"masterQuest.id: '{mqid}' deve iniziare con 'mq_' e rispettare [a-z0-9_]")
+    if not isinstance(mqid, str) or not ID_RE.match(mqid):
+        fail(errors, f"masterQuest.id: '{mqid}' deve rispettare [a-z0-9_], 1-100 caratteri")
 
     for f in ("name", "subtitle", "description", "hint"):
         if f in mq:
@@ -197,14 +195,10 @@ def validate(raw_text: str) -> list[str]:
     errors: list[str] = []
     text = raw_text.strip()
 
-    if not text.startswith(PREFIX):
-        fail(errors, f"L'output deve iniziare con la riga esatta '{PREFIX}'")
-        return errors
-
-    json_part = text[len(PREFIX):]
-    if "\n" in json_part.strip("\n"):
-        # Non è un errore fatale (potrebbe essere solo un a-capo finale), ma segnaliamo.
-        pass
+    if text.startswith(PREFIX):
+        json_part = text[len(PREFIX):]
+    else:
+        json_part = text
 
     try:
         data = json.loads(json_part)
@@ -212,16 +206,18 @@ def validate(raw_text: str) -> list[str]:
         fail(errors, f"JSON non valido: {e}")
         return errors
 
-    if not isinstance(data, dict) or "masterQuests" not in data:
-        fail(errors, "Atteso oggetto top-level con chiave 'masterQuests'")
+    if not isinstance(data, dict):
+        fail(errors, "Atteso oggetto MasterQuest diretto (oppure wrapper con chiave 'masterQuests')")
         return errors
 
-    mqs = data["masterQuests"]
-    if not isinstance(mqs, list) or len(mqs) != 1:
-        fail(errors, f"'masterQuests' deve contenere esattamente 1 elemento, trovati {len(mqs) if isinstance(mqs, list) else 0}")
-        return errors
+    if "masterQuests" in data:
+        mqs = data["masterQuests"]
+        if not isinstance(mqs, list) or len(mqs) != 1:
+            fail(errors, f"'masterQuests' deve contenere esattamente 1 elemento, trovati {len(mqs) if isinstance(mqs, list) else 0}")
+            return errors
+        data = mqs[0]
 
-    check_master_quest(mqs[0], errors)
+    check_master_quest(data, errors)
     return errors
 
 

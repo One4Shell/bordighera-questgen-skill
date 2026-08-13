@@ -2,11 +2,12 @@
 name: bordighera-questgen
 description: >-
   Genera masterquest complete in formato JSON per "UrbanQuest Bordighera", un
-  gioco urbano a tappe nella città di Bordighera (Italia). Usa questa skill
-  quando l'utente chiede di generare, creare o scrivere una "masterquest",
-  una "quest", un "percorso" o un "itinerario di gioco" per UrbanQuest
-  Bordighera a partire da un testo, tema o lore di ispirazione, oppure quando
-  menziona esplicitamente il formato di output "masterquest output {...}".
+  gioco urbano a tappe nella città di Bordighera (Italia), scrivendo il
+  risultato nel file "masterquest.json" nella cartella corrente. Usa questa
+  skill quando l'utente chiede di generare, creare o scrivere una
+  "masterquest", una "quest", un "percorso" o un "itinerario di gioco" per
+  UrbanQuest Bordighera a partire da un testo, tema o lore di ispirazione,
+  oppure quando menziona il file "masterquest.json".
 license: MIT
 ---
 
@@ -15,8 +16,9 @@ license: MIT
 Questa skill trasforma l'agent in un **game designer e scrittore creativo**
 specializzato in "UrbanQuest Bordighera". Il suo unico compito è produrre,
 a partire da un testo di ispirazione fornito dall'utente, **una masterquest
-completa** in un formato JSON rigidamente specificato, senza alcun testo
-aggiuntivo prima o dopo.
+completa** in un formato JSON rigidamente specificato e scriverla nel file
+**`masterquest.json`** nella cartella corrente di lavoro, senza alcun testo
+aggiuntivo.
 
 ## Quando usare questa skill
 
@@ -24,7 +26,7 @@ Attiva questa skill quando l'utente:
 - chiede di generare/creare una "masterquest", una "quest" o un "percorso"
   per UrbanQuest Bordighera;
 - fornisce un testo/tema/lore e chiede di trasformarlo in una quest urbana;
-- fa riferimento al formato `masterquest output {...}`;
+- chiede di scrivere o aggiornare il file `masterquest.json`;
 - chiede di validare o correggere una masterquest già generata (in tal caso
   usa comunque `references/schema.md` come fonte di verità e, se disponibile,
   `scripts/validate.py` per la verifica automatica).
@@ -47,18 +49,17 @@ Prima di scrivere qualunque JSON, consulta in ordine:
 
 ## Contratto di output (non negoziabile)
 
-- La risposta **deve iniziare** con la riga esatta `masterquest output `
-  seguita immediatamente dall'oggetto JSON, sulla stessa riga.
-- **Nessun testo prima** della riga `masterquest output` (niente saluti,
-  niente spiegazioni, niente markdown).
-- **Nessun testo dopo** il JSON.
-- Nessun blocco di codice, nessun backtick, nessuna virgola finale (trailing
-  comma), nessun commento nel JSON.
+- L'unico risultato è il file **`masterquest.json`** scritto nella **cartella
+  corrente di lavoro**, contenente un **unico oggetto JSON** (la `MasterQuest`
+  diretta, senza wrapper `masterQuests`).
+- Il file deve contenere **solo JSON**: nessun blocco di codice, nessun
+  backtick, nessun commento, nessuna virgola finale (trailing comma), nessun
+  testo aggiuntivo dentro o fuori dal JSON.
 - Il JSON deve essere valido e conforme **esattamente** allo schema in
   `references/schema.md`.
-- Se non è disponibile un vero tool di esecuzione codice per validare
-  meccanicamente il JSON, rileggi comunque l'output prodotto confrontandolo
-  campo per campo con `references/schema.md` prima di consegnarlo.
+- Non rispondere con testo narrativo nella chat oltre a una brevissima
+  conferma (es. "`masterquest.json` scritto"); **mai** stampare il JSON nel
+  messaggio.
 
 ## Composizione fissa delle 5 sotto-quest
 
@@ -94,11 +95,10 @@ non deve necessariamente essere photo-word-word-moving-moving):
    lunghezza.
 6. Componi il JSON finale seguendo `references/schema.md` e
    `references/example-output.md` campo per campo.
-7. Prima di rispondere, verifica mentalmente (o con
+7. Prima di scrivere il file, verifica mentalmente (o con
    `scripts/validate.py`, se hai accesso a un interprete Python) che:
    - ci siano esattamente 5 sotto-quest con la composizione 1/2/2 corretta;
-   - tutti gli `id` siano unici, minuscoli, `[a-z0-9_]`, con il prefisso
-     giusto (`mq_`, `photo_`, `word_`, `moving_`);
+   - tutti gli `id` siano unici, minuscoli, `[a-z0-9_]`;
    - ogni tappa `word` abbia `answers` con più varianti reali, tutte
      minuscole e senza punteggiatura;
    - ogni tappa `moving` abbia `speed` tra 2 e 4 e almeno 5 waypoint
@@ -106,8 +106,10 @@ non deve necessariamente essere photo-word-word-moving-moving):
    - tutte le lat/lng rientrino nell'area di gioco definita in
      `references/coordinates.md`;
    - non manchi nessun campo obbligatorio dello schema.
-8. Rispondi **solo** con la riga `masterquest output {...}`, senza altro
-   testo.
+8. Scrivi il JSON validato nel file **`masterquest.json`** nella cartella
+   corrente di lavoro, come unico contenuto del file. Conferma in chat solo
+   con una breve nota (es. "`masterquest.json` scritto"), senza stampare il
+   JSON.
 
 ## Se ti viene chiesto di validare un output esistente
 

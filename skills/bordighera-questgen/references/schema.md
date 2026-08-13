@@ -6,8 +6,12 @@ suggerito.
 
 ## Oggetto top-level
 
+L'output è un **oggetto `MasterQuest` diretto** (senza wrapper `masterQuests`).
+Il risultato della generazione viene scritto nel file `masterquest.json` nella
+cartella corrente di lavoro.
+
 ```json
-{ "masterQuests": [ /* esattamente 1 <MasterQuest> */ ] }
+{ /* esattamente 1 <MasterQuest> */ }
 ```
 
 ## `<MasterQuest>`
@@ -18,7 +22,7 @@ Campo opzionale: `hintImage`.
 
 | Campo | Tipo | Regole |
 | --- | --- | --- |
-| `id` | string | Unico, `[a-z0-9_]`, 1-100 caratteri, minuscolo, prefisso `mq_` + slug del tema (es. `mq_sentiero_dei_pirati`). Vietati spazi, trattini, punti, maiuscole. |
+| `id` | string | Unico, `[a-z0-9_]`, 1-100 caratteri, minuscolo. Formato suggerito: slug del tema, eventualmente con suffisso (`masterquestname_timestamp`, es. `masterquest_sentiero_pirati`). Vietati spazi, trattini, punti, maiuscole. |
 | `name` | `{ it, en }` | Titolo del percorso, tono narrativo accattivante. |
 | `subtitle` | `{ it, en }` | Frase breve che invita ad accettare la quest. |
 | `description` | `{ it, en }` | Descrizione del percorso e dell'avventura. |
@@ -49,13 +53,14 @@ Campo opzionale: `hintImage`.
 
 | Campo | Tipo | Regole |
 | --- | --- | --- |
-| `id` | string | Unico, minuscolo `[a-z0-9_]`, prefisso del tipo: `photo_`, `word_`, `moving_` + slug (es. `word_statua_regina`). |
+| `id` | string | Unico, minuscolo `[a-z0-9_]`, 1-100 caratteri. Formato suggerito: slug della tappa, eventualmente con suffisso (`questname_timestamp`, es. `statua_regina_1234567890`). Non richiede prefisso per tipo. |
 | `name` | `{ it, en }` | Nome evocativo della tappa. |
 | `subtitle` | `{ it, en }` | Frase breve e misteriosa. |
 | `lat` / `lng` | number | Posizione reale della tappa a Bordighera. |
 | `description` | `{ it, en }` | Narrazione atmosferica + cosa fare. Per `photo`: "scatta una foto del..."; per `word`: la domanda precisa. |
 | `hint` | `{ it, en }` | Indizio enigmatico, senza rivelare la risposta. |
 | `icon` | string | Sempre `"quest"`. |
+| `hintImage` | string | Opzionale: immagine della tappa (es. `data:image/webp,...`). |
 
 ## Campi specifici per tipo
 
@@ -79,9 +84,9 @@ quelli comuni.
 
 ## Regole di formato dell'output
 
-- La risposta inizia con la riga esatta `masterquest output ` seguita
-  immediatamente, sulla stessa riga, dall'oggetto JSON.
-- Nessun testo prima della riga `masterquest output`.
-- Nessun testo dopo il JSON.
-- Nessun backtick, nessun blocco markdown, nessuna virgola finale.
-- JSON valido, campi tutti presenti come da schema, nessun campo extra.
+- Il risultato è un **unico oggetto JSON** (MasterQuest) privo di testo
+  aggiuntivo, scritto nel file `masterquest.json` nella cartella corrente
+  di lavoro.
+- Nessun campo extra rispetto allo schema, nessun campo mancante.
+- Nessun commento, nessuna virgola finale (trailing comma), nessun backtick
+  nel file: JSON valido.

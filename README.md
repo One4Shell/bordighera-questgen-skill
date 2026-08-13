@@ -10,9 +10,9 @@ generato prima di consegnarlo.
 La skill insegna al tuo coding agent (Claude Code, OpenCode, Codex, Cursor e
 altri) a generare **masterquest** complete per "UrbanQuest Bordighera", un
 gioco urbano a tappe nella città di Bordighera (Italia) — rispettando sempre
-lo stesso schema JSON, lo stesso formato di output a riga singola e le stesse
-regole geografiche/narrative, invece di reinventare la struttura a ogni
-richiesta. Vedi `skills/bordighera-questgen/SKILL.md` per il pattern completo.
+lo stesso schema JSON, scrivendo il risultato nel file `masterquest.json`
+nella cartella corrente di lavoro. Vedi `skills/bordighera-questgen/SKILL.md`
+per il pattern completo.
 
 ## Install (consigliata)
 
@@ -91,10 +91,10 @@ passato `--force`, quindi è sicuro rieseguirli.
 skills/bordighera-questgen/       # layout del repo — scopribile anche come .agents/skills/bordighera-questgen
 ├── SKILL.md                      # entry point che l'agent legge
 ├── scripts/
-│   └── validate.py               # valida una riga "masterquest output {...}" contro lo schema
+│   └── validate.py               # valida un file masterquest.json contro lo schema
 └── references/
     ├── schema.md                 # schema JSON completo di MasterQuest e SottoQuest
-    ├── example-output.md         # esempio di riferimento (formato, ordine campi, stile)
+    ├── example-output.md         # esempio di riferimento (struttura, ordine campi, stile)
     ├── coordinates.md            # regole geografiche per Bordighera e per i waypoint moving
     └── style-guide.md            # regole di narrativa, tono e struttura in 5 tappe
 ```
@@ -112,12 +112,13 @@ Genera una masterquest per UrbanQuest Bordighera a partire da questo testo:
 ```
 
 L'agent leggerà `SKILL.md`, applicherà lo schema e le regole in `references/`
-e risponderà **esclusivamente** con la riga `masterquest output {...}`.
+e scriverà il risultato nel file **`masterquest.json`** nella cartella
+corrente di lavoro.
 
-Per validare un output prima di importarlo nel gioco:
+Per validare il file generato prima di importarlo nel gioco:
 
 ```
-python3 .agents/skills/bordighera-questgen/scripts/validate.py path/to/output.txt
+python3 .agents/skills/bordighera-questgen/scripts/validate.py masterquest.json
 ```
 
 ## License
