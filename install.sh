@@ -5,13 +5,13 @@
 #   ./install.sh [--dir <path>] [--path <path>] [--claude] [--force]
 #
 # Oppure via curl (senza checkout locale):
-#   curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/install.sh | bash
-#   curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/install.sh | bash -s -- --claude
+#   curl -fsSL https://raw.githubusercontent.com/One4Shell/bordighera-questgen-skill/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/One4Shell/bordighera-questgen-skill/main/install.sh | bash -s -- --claude
 
 set -euo pipefail
 
 SKILL_NAME="bordighera-questgen"
-REPO="${BORDIGHERA_QUESTGEN_REPO:-<owner>/bordighera-questgen-skill}"
+REPO="${BORDIGHERA_QUESTGEN_REPO:-One4Shell/bordighera-questgen-skill}"
 BRANCH="${BORDIGHERA_QUESTGEN_BRANCH:-main}"
 
 TARGET_DIR="$(pwd)"

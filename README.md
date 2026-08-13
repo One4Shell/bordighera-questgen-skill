@@ -23,7 +23,7 @@ quindi si installa con un solo comando via [`npx skills`](https://github.com/ver
 — nessun clone, nessuna configurazione:
 
 ```
-npx skills add https://github.com/<tuo-org>/bordighera-questgen-skill --skill bordighera-questgen
+npx skills add https://github.com/One4Shell/bordighera-questgen-skill --skill bordighera-questgen
 ```
 
 `npx skills` rileva automaticamente quali coding agent hai installato e copia
@@ -41,20 +41,20 @@ Se preferisci non dipendere dalla CLI `skills`, usa l'installer shell incluso
 in questo repo:
 
 ```
-curl -fsSL https://raw.githubusercontent.com/<tuo-org>/bordighera-questgen-skill/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/One4Shell/bordighera-questgen-skill/main/install.sh | bash
 ```
 
 Per passare opzioni attraverso la pipe, usa `bash -s --`:
 
 ```
-curl -fsSL https://raw.githubusercontent.com/<tuo-org>/bordighera-questgen-skill/main/install.sh | bash -s -- --claude
+curl -fsSL https://raw.githubusercontent.com/One4Shell/bordighera-questgen-skill/main/install.sh | bash -s -- --claude
 ```
 
 Oppure clona ed esegui localmente (nessun accesso di rete necessario
 all'installazione):
 
 ```
-git clone https://github.com/<tuo-org>/bordighera-questgen-skill.git
+git clone https://github.com/One4Shell/bordighera-questgen-skill.git
 cd bordighera-questgen-skill
 ./install.sh --dir /path/to/your/project
 ```
