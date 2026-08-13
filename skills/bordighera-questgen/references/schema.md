@@ -1,0 +1,87 @@
+# Schema JSON — MasterQuest
+
+Fonte di verità per la struttura dell'output di `bordighera-questgen`. Non
+inventare campi, non ometterne, non rinominarli, non cambiare l'ordine
+suggerito.
+
+## Oggetto top-level
+
+```json
+{ "masterQuests": [ /* esattamente 1 <MasterQuest> */ ] }
+```
+
+## `<MasterQuest>`
+
+Campi obbligatori: `id`, `name`, `subtitle`, `description`, `hint`, `lat`,
+`lng`, `icon`, `type`, `enabled`, `collectible`, `reward`, `quests`.
+Campo opzionale: `hintImage`.
+
+| Campo | Tipo | Regole |
+| --- | --- | --- |
+| `id` | string | Unico, `[a-z0-9_]`, 1-100 caratteri, minuscolo, prefisso `mq_` + slug del tema (es. `mq_sentiero_dei_pirati`). Vietati spazi, trattini, punti, maiuscole. |
+| `name` | `{ it, en }` | Titolo del percorso, tono narrativo accattivante. |
+| `subtitle` | `{ it, en }` | Frase breve che invita ad accettare la quest. |
+| `description` | `{ it, en }` | Descrizione del percorso e dell'avventura. |
+| `hint` | `{ it, en }` | Indizio su come iniziare (raggiungere il punto giallo sulla mappa). |
+| `lat` / `lng` | number | Coordinate del punto di partenza/accettazione, nella zona reale di Bordighera. Vedi `coordinates.md`. |
+| `icon` | string | Sempre `"quest"`. |
+| `type` | string | Sempre `"master"`. |
+| `enabled` | boolean | Sempre `true`. |
+| `hintImage` | string | Opzionale: percorso immagine, es. `sponsor/premi/<sponsor>-premio.webp`. |
+| `collectible` | string | Percorso del modello collezionabile sbloccato al completamento, es. `public/models/<slug>/mq_<slug>.obj`. |
+| `reward` | oggetto | Vedi sotto. |
+| `quests` | array | Esattamente 5 sotto-quest: 1 `photo`, 2 `word`, 2 `moving`. |
+
+### `reward`
+
+| Campo | Tipo | Regole |
+| --- | --- | --- |
+| `sponsorId` | string | Id dello sponsor che finanzia il premio (minuscolo, senza spazi). |
+| `title` | `{ it, en }` | Titolo del premio (es. "Il tuo premio ti aspetta"). |
+| `description` | `{ it, en }` | Cosa e come riscattare il premio presso lo sponsor; può contenere `<strong>` per evidenziare il premio. |
+| `share.text` | `{ it, en }` | Testo di condivisione con placeholder `{path}`, `{name}`, `{url}`, `{tags}`. |
+| `share.hashtags` | array&lt;string&gt; | Almeno `["BordigheraQuest","Bordighera"]`. |
+| `share.facebook` | string | URL pagina Facebook dello sponsor. |
+| `share.instagram` | string | URL pagina Instagram dello sponsor. |
+| `sponsorPin` | string | PIN numerico di riscatto, 4 cifre (es. `"0000"`). |
+
+## `<SottoQuest>` — campi comuni a tutti i tipi
+
+| Campo | Tipo | Regole |
+| --- | --- | --- |
+| `id` | string | Unico, minuscolo `[a-z0-9_]`, prefisso del tipo: `photo_`, `word_`, `moving_` + slug (es. `word_statua_regina`). |
+| `name` | `{ it, en }` | Nome evocativo della tappa. |
+| `subtitle` | `{ it, en }` | Frase breve e misteriosa. |
+| `lat` / `lng` | number | Posizione reale della tappa a Bordighera. |
+| `description` | `{ it, en }` | Narrazione atmosferica + cosa fare. Per `photo`: "scatta una foto del..."; per `word`: la domanda precisa. |
+| `hint` | `{ it, en }` | Indizio enigmatico, senza rivelare la risposta. |
+| `icon` | string | Sempre `"quest"`. |
+
+## Campi specifici per tipo
+
+### 1. `photo`
+
+`type` omesso oppure `"type": "photo"`. Nessun campo aggiuntivo oltre a
+quelli comuni.
+
+### 2. `word` — `"type": "word"`
+
+| Campo | Tipo | Regole |
+| --- | --- | --- |
+| `answers` | array&lt;string&gt; | Risposte esatte accettate, **tutte minuscole, senza punteggiatura**, con **più varianti reali** in italiano e inglese (sinonimi, forme senza apostrofi, ecc.). Esempio: `["serpente","snake","serpent","vipera","biscia"]`. |
+
+### 3. `moving` — `"type": "moving"`
+
+| Campo | Tipo | Regole |
+| --- | --- | --- |
+| `speed` | number | Velocità del bersaglio, valori realistici 2-4. |
+| `waypoints` | array&lt;[lat, lng]&gt; | Almeno 5 coppie di coordinate che formano il percorso di pattuglia, tutte nella zona giocabile di Bordighera. Vedi `coordinates.md`. |
+
+## Regole di formato dell'output
+
+- La risposta inizia con la riga esatta `masterquest output ` seguita
+  immediatamente, sulla stessa riga, dall'oggetto JSON.
+- Nessun testo prima della riga `masterquest output`.
+- Nessun testo dopo il JSON.
+- Nessun backtick, nessun blocco markdown, nessuna virgola finale.
+- JSON valido, campi tutti presenti come da schema, nessun campo extra.
