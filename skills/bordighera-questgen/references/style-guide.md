@@ -93,11 +93,39 @@ un arco completo, costruito in stile **"caccia al segreto della città"**:
 | `description` | 2-4 righe |
 | `hint` | una o due frasi |
 
+## Prompt delle immagini `hintImage` (per "nano banana")
+
+Per ogni tappa `word`/`moving` bisogna scrivere in `images.json` il `prompt`
+(inglese) di generazione della sua immagine `hintImage`, pensato per
+**"nano banana"** (Gemini image model): accetta prompt narrativi, natural
+language, dettagliati — non liste di keyword.
+
+### Regole di scrittura
+
+- **Lingua**: inglese. **Stile**: narrativo e specifico, tipo spec di sceneggiatura.
+- **Per le `moving`** (character): descrivi il **personaggio/NPC** che
+  pattuglia (aspetto, abbigliamento, atteggiamento) in **azione** nel luogo
+  reale della polilinea (banchina, lungomare, borgo, rotonda).
+- **Per le `word`** (clue): descrivi la **scena o l'oggetto del clue** (sito,
+  iscrizione, statua, porta) in modo atmosferico ma **senza mai rivelare la
+  risposta**, e senza scrivere alcun testo/parola nell'immagine.
+- **Struttura consigliata**: soggetto → azione → luogo/contesto → composizione
+  → luce → stile. Usa framing positivo (descrivi cosa vuoi, non cosa non
+  vuoi), termini di camera/illuminazione concreti e chiusura con vincoli
+  ("no text", "no watermark").
+- **Coerenza tra le immagini**: stessa famiglia stilistica (es. illustrazione
+  narrativa da gioco di avventura), stessa palette dominante (tonalità
+  mediterranee: pietra chiara, turchese, ambra) e aspect ratio coerente
+  (es. 16:9) in tutti i prompt della masterquest.
+- **Coerenza con la narrazione**: i dettagli visivi (luoghi, personaggio,
+  orari di luce) devono venire da `description`/`hint` della tappa e dalle
+  storie verificate di `history.md`; mai elementi che contraddicono la storia.
+
 ## Cosa evitare
 
-- Non uscire mai dal contratto di output: il risultato è il file
-  `masterquest.json` nella cartella corrente (vedi `SKILL.md`), senza testo
-  esterno.
+- Non uscire mai dal contratto di output: il risultato sono i file
+  `masterquest.json` e `images.json` nella cartella corrente (vedi `SKILL.md`),
+  senza testo esterno.
 - Non introdurre campi non previsti dallo schema, anche se "utili" per la
   narrazione (es. `story`, `chapter`, `difficulty` non esistono).
 - Non rendere gli `hint` troppo espliciti: devono richiedere osservazione,

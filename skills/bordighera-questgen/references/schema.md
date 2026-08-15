@@ -83,11 +83,40 @@ quelli comuni.
 | `speed` | number | Velocità del bersaglio, valori realistici 2-4. |
 | `waypoints` | array&lt;[lat, lng]&gt; | Almeno 5 coppie di coordinate che formano il percorso di pattuglia, che deve seguire una **polilinea verificata** di `references/locations.json` (distanza tra waypoint di poche decine di metri). Vedi `coordinates.md`. |
 
+> **Nota su `hintImage`**: le sotto-quest `word` e `moving` devono sempre
+> valorizzare `hintImage` con il pattern `public/images/quests/<quest_id>.webp`
+> (mai `data:`): ogni `hintImage` di tappa `word`/`moving` deve avere una entry
+> corrispondente in `images.json`.
+
+## `<ImagesFile>` — il file `images.json`
+
+Scritto nella cartella corrente di lavoro insieme a `masterquest.json`. È un
+**array** di oggetti, con **una entry per ogni sotto-quest di tipo `word` o
+`moving`** (1–4 voci dopo la generazione: 2 `word` + 2 `moving`). Nessuna
+entry per le `photo` (che non hanno `hintImage`) né per la master. Le entry
+devono apparire nello stesso ordine delle tappe in `masterquest.json`.
+
+### Entry (una per tappa `word`/`moving`)
+
+| Campo | Tipo | Regole |
+| --- | --- | --- |
+| `id` | string | `id` della sotto-quest in `masterquest.json`, identico (minuscolo `[a-z0-9_]`). |
+| `hintImage` | string | Identico al campo `hintImage` della tappa (`public/images/quests/<quest_id>.webp`). È il **nome dell'immagine** della quest. |
+| `prompt` | string | Prompt **ottimizzato per "nano banana"** (Gemini image model) per generare l'immagine `hintImage`, in **inglese**, descrittivo e specifico: per `moving` il character/NPC che pattuglia; per `word` la scena o l'oggetto del clue, senza mai rivelare la risposta. Regole di scrittura in `style-guide.md`. |
+
+### Formato
+
+- Un **array JSON** unico (non un wrapper), privo di testo aggiuntivo.
+- Nessun campo extra oltre a `id`, `hintImage`, `prompt`.
+- Nessun commento, nessuna virgola finale (trailing comma), nessun backtick:
+  JSON valido.
+
 ## Regole di formato dell'output
 
 - Il risultato è un **unico oggetto JSON** (MasterQuest) privo di testo
   aggiuntivo, scritto nel file `masterquest.json` nella cartella corrente
-  di lavoro.
+  di lavoro, **più** il file `images.json` (array di entry `{id, hintImage,
+  prompt}` per le tappe `word`/`moving`) nella stessa cartella.
 - Nessun campo extra rispetto allo schema, nessun campo mancante.
 - Nessun commento, nessuna virgola finale (trailing comma), nessun backtick
-  nel file: JSON valido.
+  nei file: JSON valido.

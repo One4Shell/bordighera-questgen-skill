@@ -3,11 +3,12 @@ name: bordighera-questgen
 description: >-
   Genera masterquest complete in formato JSON per "UrbanQuest Bordighera", un
   gioco urbano a tappe nella città di Bordighera (Italia), scrivendo il
-  risultato nel file "masterquest.json" nella cartella corrente. Usa questa
-  skill quando l'utente chiede di generare, creare o scrivere una
-  "masterquest", una "quest", un "percorso" o un "itinerario di gioco" per
-  UrbanQuest Bordighera a partire da un testo, tema o lore di ispirazione,
-  oppure quando menziona il file "masterquest.json".
+  risultato nei file "masterquest.json" e "images.json" nella cartella
+  corrente. Usa questa skill quando l'utente chiede di generare, creare o
+  scrivere una "masterquest", una "quest", un "percorso" o un "itinerario di
+  gioco" per UrbanQuest Bordighera a partire da un testo, tema o lore di
+  ispirazione, oppure quando menziona i file "masterquest.json" o
+  "images.json".
 license: MIT
 ---
 
@@ -17,8 +18,10 @@ Questa skill trasforma l'agent in un **game designer e scrittore creativo**
 specializzato in "UrbanQuest Bordighera". Il suo unico compito è produrre,
 a partire da un testo di ispirazione fornito dall'utente, **una masterquest
 completa** in un formato JSON rigidamente specificato e scriverla nel file
-**`masterquest.json`** nella cartella corrente di lavoro, senza alcun testo
-aggiuntivo.
+**`masterquest.json`** nella cartella corrente di lavoro, insieme al file
+**`images.json`** che raccoglie, per ogni tappa `word` (clue) e `moving`
+(character), il prompt ottimizzato (per il generatore d'immagini "nano
+banana") della rispettiva immagine `hintImage`. Nessun testo aggiuntivo.
 
 ## Quando usare questa skill
 
@@ -26,7 +29,7 @@ Attiva questa skill quando l'utente:
 - chiede di generare/creare una "masterquest", una "quest" o un "percorso"
   per UrbanQuest Bordighera;
 - fornisce un testo/tema/lore e chiede di trasformarlo in una quest urbana;
-- chiede di scrivere o aggiornare il file `masterquest.json`;
+- chiede di scrivere o aggiornare i file `masterquest.json` / `images.json`;
 - chiede di validare o correggere una masterquest già generata (in tal caso
   usa comunque `references/schema.md` come fonte di verità e, se disponibile,
   `scripts/validate.py` per la verifica automatica).
@@ -53,21 +56,29 @@ Prima di scrivere qualunque JSON, consulta in ordine:
    distanza tra le tappe e sui waypoint dei bersagli `moving`.
 6. `references/style-guide.md` — le regole di tono, narrativa e struttura in
    5 tappe (introduzione → sviluppo → climax → conclusione), in stile
-   "caccia al segreto della città".
+   "caccia al segreto della città", più le regole per i prompt delle immagini
+   `hintImage` per "nano banana".
 
 ## Contratto di output (non negoziabile)
 
-- L'unico risultato è il file **`masterquest.json`** scritto nella **cartella
-  corrente di lavoro**, contenente un **unico oggetto JSON** (la `MasterQuest`
-  diretta, senza wrapper `masterQuests`).
-- Il file deve contenere **solo JSON**: nessun blocco di codice, nessun
-  backtick, nessun commento, nessuna virgola finale (trailing comma), nessun
-  testo aggiuntivo dentro o fuori dal JSON.
-- Il JSON deve essere valido e conforme **esattamente** allo schema in
+La generazione produce **due file JSON** nella **cartella corrente di
+lavoro**: `masterquest.json` e `images.json`.
+
+- **`masterquest.json`** — l'unico risultato della master quest: un **unico
+  oggetto JSON** (la `MasterQuest` diretta, senza wrapper `masterQuests`).
+- **`images.json`** — un **array di oggetti** `{id, hintImage, prompt}`, con
+  **una entry per ogni sotto-quest di tipo `word` o `moving`** (cioè 2 `word`
+  + 2 `moving` = 4 entry): il nome dell'immagine `hintImage` della tappa e il
+  `prompt` ottimizzato in inglese per generarla con "nano banana". Nessuna
+  entry per le tappe `photo` (senza `hintImage`) né per la master.
+- Entrambi i file devono contenere **solo JSON**: nessun blocco di codice,
+  nessun backtick, nessun commento, nessuna virgola finale (trailing comma),
+  nessun testo aggiuntivo dentro o fuori dal JSON.
+- I JSON devono essere validi e conformi **esattamente** allo schema in
   `references/schema.md`.
 - Non rispondere con testo narrativo nella chat oltre a una brevissima
-  conferma (es. "`masterquest.json` scritto"); **mai** stampare il JSON nel
-  messaggio.
+  conferma (es. "`masterquest.json` e `images.json` scritti"); **mai**
+  stampare il JSON nel messaggio.
 
 ## Composizione fissa delle 5 sotto-quest
 
@@ -109,7 +120,10 @@ non deve necessariamente essere photo-word-word-moving-moving):
    mistero/"caccia al segreto") e lunghezza. Le domande `word` devono avere
    risposta osservabile sul posto o derivabile dalla `description`/`hint`.
 6. Componi il JSON finale seguendo `references/schema.md` e
-   `references/example-output.md` campo per campo.
+   `references/example-output.md` campo per campo. Le sotto-quest `word` e
+   `moving` devono avere sempre il campo `hintImage` valorizzato con il
+   pattern `public/images/quests/<quest_id>.webp`, così da generare anche la
+   corrispondente entry in `images.json`.
 7. Prima di scrivere il file, verifica con `scripts/validate.py` (se hai
    accesso a un interprete Python) oppure mentalmente che:
    - ci siano esattamente 5 sotto-quest con la composizione 1/2/2 corretta;
@@ -122,11 +136,26 @@ non deve necessariamente essere photo-word-word-moving-moving):
      POI o una polilinea verificata** di `locations.json` e rientrino
      nell'area di gioco di `references/coordinates.md`;
    - i fatti storici citati nei testi siano presenti in `references/history.md`;
-   - non manchi nessun campo obbligatorio dello schema.
+   - non manchi nessun campo obbligatorio dello schema;
+   - ogni tappa `word`/`moving` abbia `hintImage` (pattern
+     `public/images/quests/<quest_id>.webp`) e una entry corrispondente in
+     `images.json`.
 8. Scrivi il JSON validato nel file **`masterquest.json`** nella cartella
-   corrente di lavoro, come unico contenuto del file. Conferma in chat solo
-   con una breve nota (es. "`masterquest.json` scritto"), senza stampare il
-   JSON.
+   corrente di lavoro, come unico contenuto del file.
+9. Genera **`images.json`**: per ogni sotto-quest di tipo `word`/`moving`
+   presente in `masterquest.json`, crea una entry `{id, hintImage, prompt}`:
+   - `id` = id della tappa (minuscolo, uguale a quello in `masterquest.json`);
+   - `hintImage` = identico al campo `hintImage` della tappa in
+     `masterquest.json`;
+   - `prompt` = prompt ottimizzato in inglese per generare l'immagine con
+     "nano banana", seguendo le regole di `references/style-guide.md` (per le
+     `moving` il character/NPC che pattuglia; per le `word` la scena/l'oggetto
+     del clue, senza mai scrivere la risposta). Usa `references/example-output.md`
+     come riferimento per stile e contenuto dei prompt.
+10. Scrivi il JSON validato nel file **`images.json`** nella cartella corrente
+    di lavoro, come unico contenuto del file. Conferma in chat solo con una
+    breve nota (es. "`masterquest.json` e `images.json` scritti"), senza
+    stampare i JSON.
 
 ## Se ti viene chiesto di validare un output esistente
 

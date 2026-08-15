@@ -10,9 +10,9 @@ generato prima di consegnarlo.
 La skill insegna al tuo coding agent (Claude Code, OpenCode, Codex, Cursor e
 altri) a generare **masterquest** complete per "UrbanQuest Bordighera", un
 gioco urbano a tappe nella città di Bordighera (Italia) — rispettando sempre
-lo stesso schema JSON, scrivendo il risultato nel file `masterquest.json`
-nella cartella corrente di lavoro. Vedi `skills/bordighera-questgen/SKILL.md`
-per il pattern completo.
+lo stesso schema JSON e scrivendo il risultato nei file `masterquest.json` e
+`images.json` nella cartella corrente di lavoro. Vedi
+`skills/bordighera-questgen/SKILL.md` per il pattern completo.
 
 Ogni masterquest è costruita su **storie verificate** di Bordighera
 (`references/history.md`, con fonti) e su **luoghi verificati** con
@@ -127,8 +127,10 @@ Genera una masterquest per UrbanQuest Bordighera a partire da questo testo:
 ```
 
 L'agent leggerà `SKILL.md`, applicherà lo schema e le regole in `references/`
-e scriverà il risultato nel file **`masterquest.json`** nella cartella
-corrente di lavoro.
+e scriverà il risultato nei file **`masterquest.json`** (la quest completa) e
+**`images.json`** (per ogni tappa `word`/`moving`: nome dell'immagine
+`hintImage` e prompt ottimizzato per il generatore d'immagini "nano banana")
+nella cartella corrente di lavoro.
 
 Per validare il file generato prima di importarlo nel gioco:
 

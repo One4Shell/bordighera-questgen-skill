@@ -4,10 +4,11 @@ Questo è l'esempio **obbligatorio** di riferimento per struttura, ordine dei
 campi, tipi e stile. Mostra l'output completo con **5 tappe** (1 `photo`,
 2 `word`, 2 `moving`), come richiesto dallo schema.
 
-Il risultato della generazione viene scritto nel file **`masterquest.json`**
-nella cartella corrente di lavoro, come oggetto JSON valido senza alcun testo
-aggiuntivo. Nessun wrapper `masterQuests`, nessuna riga di prefisso, nessun
-blocco markdown, nessun backtick.
+Il risultato della generazione viene scritto in due file JSON nella cartella
+corrente di lavoro: **`masterquest.json`** (oggetto JSON valido senza alcun
+testo aggiuntivo; nessun wrapper `masterQuests`, nessuna riga di prefisso,
+nessun blocco markdown, nessun backtick) e **`images.json`** (array di entry
+`{id, hintImage, prompt}` per le tappe `word`/`moving`).
 
 ## Struttura del file `masterquest.json`
 
@@ -248,6 +249,38 @@ blocco markdown, nessun backtick.
   ]
 }
 ```
+
+## Struttura del file `images.json`
+
+Un **array** con una entry per ogni sotto-quest `word`/`moving` uguale ai
+campi `id` e `hintImage` di `masterquest.json`, più il `prompt` (inglese)
+ottimizzato per "nano banana".
+
+```json
+[
+  {
+    "id": "bocca_fuoco_1712345679",
+    "hintImage": "public/images/quests/bocca_fuoco_1712345679.webp",
+    "prompt": "A weathered stone statue of a Marabutto holy man, carved with a distant serene face and flowing robes, standing on a round stone base engraved with a subtle ornamental name, flanked by two small old bronze cannons, on a seaside esplanade of the old Ligurian town of Bordighera. Golden late-afternoon Mediterranean light, warm limestone tones, slight sea mist in the background, cypress and palm silhouettes. Cinematic ground-level shot, front three-quarter view, shallow depth of field, storytelling fantasy illustration style, rich earthy palette, no text, no watermark."
+  },
+  {
+    "id": "confratelli_1712345680",
+    "hintImage": "public/images/quests/confratelli_1712345680.webp",
+    "prompt": "A narrow stone alley in the medieval borgo of Bordighera at dusk, a heavy wooden door behind a small baroque church, above the lintel a worn carved emblem of a hooded brotherhood and a small lantern glowing amber, a long shadow of a hooded figure cast on the cobblestones, still and mysterious. Low dutch-angle shot from the street, chiaroscuro lighting with warm lantern glow against cool twilight blue, cinematic composition, illustrated mystery story game art style, textured stone and weathered wood, no text, no watermark."
+  },
+  {
+    "id": "ronda_marinai_1712345681",
+    "hintImage": "public/images/quests/ronda_marinai_1712345681.webp",
+    "prompt": "A rugged old sailor character, weathered face, navy knit cap and wool coat, holding a brass lantern, walking the stone pier of Bordighera harbour at moonrise, fishing boats moored along the quay, rippling sea reflections, seagulls overhead, the lighthouse of Capo Sant'Ampelio faint in the distance. Full-body dynamic walking pose in profile, medium-wide shot, dramatic night lighting with cool moonlight and warm lantern glow, hand-painted storybook adventure game illustration style, muted navy and amber palette, no text, no watermark."
+  },
+  {
+    "id": "sentinella_palme_1712345682",
+    "hintImage": "public/images/quests/sentinella_palme_1712345682.webp",
+    "prompt": "A graceful female guardian character with flowing white dress moving swiftly along the palm-lined seafront promenade of Bordighera, long hair and dress wafting in the breeze, her right palm extended with a faint luminous trail of light, rows of date palms and elegant belle-époque villas on her flank, the turquoise Mediterranean sea glowing at golden hour. Low-angle tracking shot capturing fast motion, dynamic forward stride, warm sunset backlight with long shadows, vibrant stylized illustration art, light teal and gold palette, no text, no watermark."
+  }
+]
+```
+
 ## Cosa osservare in questo esempio
 
 - Il file `masterquest.json` è un **oggetto JSON unico**, senza wrapper
@@ -274,6 +307,15 @@ blocco markdown, nessun backtick.
   reali in italiano e inglese.
 - Le domande `word` chiedono sempre qualcosa di **osservabile sul luogo**
   (nomi incisi, targhe, statue), come nello schema.
+- Il file `images.json` è un **array** con **una entry per ogni tappa `word`
+  e `moving`** (mai per `photo` o per la master), nello stesso ordine delle
+  tappe: `id` e `hintImage` sono **identici** a quelli della tappa in
+  `masterquest.json` (pattern `public/images/quests/<quest_id>.webp`).
+- Ogni `prompt` è un **prompt narrativo ottimizzato per "nano banana"** in
+  inglese: descrive il character/NPC per le `moving` e la scena/oggetto del
+  clue (senza rivelare la risposta) per le `word`, con soggetto, azione,
+  luogo/ambientazione, composizione, luce e stile coerenti tra loro ("no
+  text", "no watermark").
 - Il percorso narrativo è coerente con le storie verificate di
   `references/history.md` (assedio del 1543, torri di avvistamento,
   confraternita dei Condannati, banchina degli Schiavi del Mare).
