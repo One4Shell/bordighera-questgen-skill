@@ -47,7 +47,6 @@ Campo opzionale: `hintImage`.
 | `share.hashtags` | array&lt;string&gt; | Almeno `["BordigheraQuest","Bordighera"]`. |
 | `share.facebook` | string | URL pagina Facebook dello sponsor. |
 | `share.instagram` | string | URL pagina Instagram dello sponsor. |
-| `sponsorPin` | string | PIN numerico di riscatto, 4 cifre (es. `"0000"`). |
 
 ## `<SottoQuest>` — campi comuni a tutti i tipi
 

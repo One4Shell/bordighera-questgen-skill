@@ -18,13 +18,19 @@ blocco markdown, nessun backtick.
   "subtitle": { "it": "Ogni esploratore ha bisogno di un punto di partenza.", "en": "Every explorer needs a starting point." },
   "description": { "it": "Completa le tappe di questo percorso e scopri i segreti nascosti di Bordighera.", "en": "Complete the stages of this path and uncover Bordighera's hidden secrets." },
   "hint": { "it": "Raggiungi il punto indicato sulla mappa e attiva la missione.", "en": "Reach the point shown on the map and activate the mission." },
-  "lat": 43.7778,
-  "lng": 7.6697,
+  "start": {
+        "lat": 43.778683888428674,
+        "lng": 7.67258908450703
+      },
+      "end": {
+        "lat": 43.7806645266007,
+        "lng": 7.67241607508907
+      },
   "icon": "quest",
   "type": "master",
   "enabled": true,
-  "hintImage": "sponsor/premi/marmura-premio.webp",
-  "collectible": "public/models/pirati/mq_pirati.obj",
+  "hintImage": "sponsor/premi/premio.webp",
+  "collectible": "public/models/masterquest_sentiero_pirati/mq_marmura.obj",
   "reward": {
     "sponsorId": "marmura",
     "title": { "it": "Il tuo premio ti aspetta", "en": "Your prize awaits you" },
@@ -35,7 +41,6 @@ blocco markdown, nessun backtick.
       "facebook": "https://www.facebook.com/",
       "instagram": "https://www.instagram.com/"
     },
-    "sponsorPin": "0000"
   },
   "quests": [
     {
@@ -58,7 +63,7 @@ blocco markdown, nessun backtick.
       "hint": { "it": "Il suo sguardo punta verso il mare, ma il suo nome guarda al passato.", "en": "Her gaze faces the sea, but her name looks to the past." },
       "icon": "quest",
       "type": "word",
-      "hintImage": "data:image/webp,...",
+      "hintImage": "public/images/quests/statua_regina_1712345679.webp",
       "answers": ["giulia", "regina", "giulia regina", "queen giulia"]
     },
     {
@@ -71,7 +76,7 @@ blocco markdown, nessun backtick.
       "hint": { "it": "Seguila mentre si muove tra le palme.", "en": "Follow her as she moves among the palms." },
       "icon": "quest",
       "type": "moving",
-      "hintImage": "data:image/webp,...",
+      "hintImage": "public/images/quests/patrol_lungomare_1712345680.webp",
       "speed": 3,
       "waypoints": [
         [43.7784, 7.6740],
@@ -91,7 +96,7 @@ blocco markdown, nessun backtick.
   `masterQuests` e senza prefissi di riga. I testi it/en sono completi, non
   segnaposto.
 - L'ordine dei campi della `MasterQuest` è: `id`, `name`, `subtitle`,
-  `description`, `hint`, `lat`, `lng`, `icon`, `type`, `enabled`,
+  `description`, `hint`, `start`, `end`, `icon`, `type`, `enabled`,
   `hintImage`, `collectible`, `reward`, `quests`.
 - L'ordine dei campi di ogni `SottoQuest` è: `id`, `name`, `subtitle`, `lat`,
   `lng`, `description`, `hint`, `icon`, poi eventuali campi specifici del
