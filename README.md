@@ -14,6 +14,14 @@ lo stesso schema JSON, scrivendo il risultato nel file `masterquest.json`
 nella cartella corrente di lavoro. Vedi `skills/bordighera-questgen/SKILL.md`
 per il pattern completo.
 
+Ogni masterquest è costruita su **storie verificate** di Bordighera
+(`references/history.md`, con fonti) e su **luoghi verificati** con
+coordinate reali (`references/locations.json`, da OpenStreetMap/Wikipedia):
+niente date o biografie inventate, niente coordinate a caso. Le tappe
+`photo`/`word` cadono sempre presso un POI reale e i percorsi `moving`
+seguono strade esistenti. Lo schema usa `start`/`end` per la master,
+`reward.price` **opzionale** e **nessun** campo `sponsorPin`.
+
 ## Install (consigliata)
 
 [#install-consigliata](#install-consigliata)
@@ -95,9 +103,16 @@ skills/bordighera-questgen/       # layout del repo — scopribile anche come .a
 └── references/
     ├── schema.md                 # schema JSON completo di MasterQuest e SottoQuest
     ├── example-output.md         # esempio di riferimento (struttura, ordine campi, stile)
+    ├── locations.json            # database dei luoghi VERIFICATI (POI + polilinee strade reali)
+    ├── history.md                # storie VERIFICATE di Bordighera con fonti e ganci narrativi
     ├── coordinates.md            # regole geografiche per Bordighera e per i waypoint moving
     └── style-guide.md            # regole di narrativa, tono e struttura in 5 tappe
 ```
+
+`scripts/validate.py` controlla in automatico che il file generato rispetti lo
+schema **e** i luoghi: errore se `start`/`end` o una tappa `photo`/`word` è a
+più di ~25 m dal POI verificato più vicino, avviso se i waypoint `moving`
+non seguono le polilinee stradali verificate.
 
 ## Dopo l'installazione
 

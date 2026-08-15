@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 import json
 import math
+import os
 import re
 import sys
 
-AREA_LAT_MIN, AREA_LAT_MAX = 43.777, 43.781
-AREA_LNG_MIN, AREA_LNG_MAX = 7.668, 7.677
+AREA_LAT_MIN, AREA_LAT_MAX = 43.777, 43.784
+AREA_LNG_MIN, AREA_LNG_MAX = 7.667, 7.677
 AREA_EPS = 0.0005
 WAYPOINT_ERROR_M = 150.0
 WAYPOINT_WARNING_M = 50.0
+POI_ERROR_M = 25.0
+PATH_WARNING_M = 60.0
 DUPLICATE_M = 1.0
 ROUTE_WARNING_M = 3500.0
 ID_RE = re.compile(r"^[a-z0-9_]{1,100}$")
 PLACEHOLDERS = ("{path}", "{name}", "{url}", "{tags}")
 REQUIRED_HASHTAGS = ("BordigheraQuest", "Bordighera")
+
+_LOCATIONS = None  # caricato sotto: {"pois": [...], "paths": [...]}
 
 MASTER_REQUIRED = (
     "id", "name", "subtitle", "description", "hint", "start", "end",
@@ -76,6 +81,46 @@ def haversine(a, b):
     return 2 * 6371000 * math.asin(math.sqrt(h))
 
 
+def load_locations():
+    """Carica references/locations.json (POI e polilinee verificate) accanto allo script."""
+    global _LOCATIONS
+    if _LOCATIONS is not None:
+        return _LOCATIONS
+    here = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(here, "..", "references", "locations.json")
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+    except OSError as e:
+        warning("locations", f"impossibile leggere {path} ({e}): controlli POI/waypoint disattivati")
+        data = {"pois": [], "paths": []}
+    except json.JSONDecodeError as e:
+        warning("locations", f"{path} non è un JSON valido ({e}): controlli POI/waypoint disattivati")
+        data = {"pois": [], "paths": []}
+    pois = [(p["lat"], p["lng"]) for p in data.get("pois", []) if "lat" in p and "lng" in p]
+    path_pts = []
+    for pa in data.get("paths", []):
+        for pt in pa.get("points", []):
+            if isinstance(pt, list) and len(pt) == 2:
+                path_pts.append((pt[0], pt[1]))
+    _LOCATIONS = {"pois": pois, "paths": path_pts}
+    return _LOCATIONS
+
+
+def nearest_poi_m(lat, lng):
+    pois = load_locations().get("pois", [])
+    if not pois:
+        return None
+    return min(haversine((lat, lng), p) for p in pois)
+
+
+def nearest_path_m(lat, lng):
+    pts = load_locations().get("paths", [])
+    if not pts:
+        return None
+    return min(haversine((lat, lng), p) for p in pts)
+
+
 def check_coords_pair(ctx, obj, where):
     if not isinstance(obj, dict):
         error(ctx, f"{where} deve essere un oggetto {{lat, lng}}")
@@ -100,12 +145,17 @@ def check_reward(ctx, reward):
     if not isinstance(reward, dict):
         error(ctx, "reward deve essere un oggetto")
         return
-    extra = set(reward) - set(REWARD_REQUIRED)
+    allowed = set(REWARD_REQUIRED) | {"price"}
+    extra = set(reward) - allowed
     if extra:
         error(ctx, f"reward ha campi non previsti: {sorted(extra)}")
     for f in REWARD_REQUIRED:
         if f not in reward:
             error(ctx, f"reward.{f} mancante")
+    price = reward.get("price")
+    if price is not None:
+        if isinstance(price, bool) or not isinstance(price, int) or price <= 0:
+            error(ctx, f"reward.price deve essere un intero positivo (o assente/0): trovato {price!r}")
     sponsor = reward.get("sponsorId")
     if not isinstance(sponsor, str) or not sponsor.strip() or sponsor != sponsor.lower() or re.search(r"\s", sponsor):
         error(ctx, f"reward.sponsorId non valido (minuscolo, senza spazi): {sponsor!r}")
@@ -178,6 +228,9 @@ def check_quest(ctx, q, idx, seen_ids):
         error(label, "lat/lng devono essere numeri")
     else:
         in_area(label, lat, lng, f"quests[{idx}]")
+        d = nearest_poi_m(lat, lng)
+        if d is not None and d > POI_ERROR_M:
+            error(label, f"posizione a {d:.0f} m dal POI verificato più vicino (max {POI_ERROR_M:.0f} m): usa un POI di references/locations.json")
         position = (lat, lng)
     if qtype == "word":
         answers = q.get("answers")
@@ -207,6 +260,9 @@ def check_quest(ctx, q, idx, seen_ids):
                     prev = None
                     continue
                 in_area(label, wp[0], wp[1], f"waypoints[{i}]")
+                d_path = nearest_path_m(wp[0], wp[1])
+                if d_path is not None and d_path > PATH_WARNING_M:
+                    warning(label, f"waypoints[{i}] a {d_path:.0f} m dalla polilinea stradale verificata più vicina (consigliate ≤ {PATH_WARNING_M:.0f} m)")
                 if prev is not None:
                     d = haversine(prev, wp)
                     if d > WAYPOINT_ERROR_M:
@@ -250,8 +306,14 @@ def validate(data):
     end = check_coords_pair(ctx, data.get("end"), "end")
     if start:
         points["master.start"] = start
+        d = nearest_poi_m(start[0], start[1])
+        if d is not None and d > POI_ERROR_M:
+            error(ctx, f"master.start a {d:.0f} m dal POI verificato più vicino (max {POI_ERROR_M:.0f} m): usa un POI di references/locations.json")
     if end:
         points["master.end"] = end
+        d = nearest_poi_m(end[0], end[1])
+        if d is not None and d > POI_ERROR_M:
+            error(ctx, f"master.end a {d:.0f} m dal POI verificato più vicino (max {POI_ERROR_M:.0f} m): usa un POI di references/locations.json")
     quests = data.get("quests")
     if not isinstance(quests, list):
         error(ctx, "quests deve essere un array")

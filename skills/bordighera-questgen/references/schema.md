@@ -16,8 +16,8 @@ cartella corrente di lavoro.
 
 ## `<MasterQuest>`
 
-Campi obbligatori: `id`, `name`, `subtitle`, `description`, `hint`, `lat`,
-`lng`, `icon`, `type`, `enabled`, `collectible`, `reward`, `quests`.
+Campi obbligatori: `id`, `name`, `subtitle`, `description`, `hint`, `start`,
+`end`, `icon`, `type`, `enabled`, `collectible`, `reward`, `quests`.
 Campo opzionale: `hintImage`.
 
 | Campo | Tipo | Regole |
@@ -27,7 +27,8 @@ Campo opzionale: `hintImage`.
 | `subtitle` | `{ it, en }` | Frase breve che invita ad accettare la quest. |
 | `description` | `{ it, en }` | Descrizione del percorso e dell'avventura. |
 | `hint` | `{ it, en }` | Indizio su come iniziare (raggiungere il punto giallo sulla mappa). |
-| `lat` / `lng` | number | Coordinate del punto di partenza/accettazione, nella zona reale di Bordighera. Vedi `coordinates.md`. |
+| `start` | `{ lat, lng }` | Coordinate del punto di partenza/accettazione della master, sempre presso un POI verificato di `references/locations.json` (vedi `coordinates.md`). |
+| `end` | `{ lat, lng }` | Coordinate del punto di arrivo/riscatto presso lo sponsor, sempre presso un POI verificato di `references/locations.json`. |
 | `icon` | string | Sempre `"quest"`. |
 | `type` | string | Sempre `"master"`. |
 | `enabled` | boolean | Sempre `true`. |
@@ -41,6 +42,7 @@ Campo opzionale: `hintImage`.
 | Campo | Tipo | Regole |
 | --- | --- | --- |
 | `sponsorId` | string | Id dello sponsor che finanzia il premio (minuscolo, senza spazi). |
+| `price` | integer | **Opzionale.** Prezzo in monete per acquistare direttamente il collezionabile senza completare il percorso. Assente o `0` = non acquistabile. Se presente, deve essere un intero positivo (es. `200`). |
 | `title` | `{ it, en }` | Titolo del premio (es. "Il tuo premio ti aspetta"). |
 | `description` | `{ it, en }` | Cosa e come riscattare il premio presso lo sponsor; può contenere `<strong>` per evidenziare il premio. |
 | `share.text` | `{ it, en }` | Testo di condivisione con placeholder `{path}`, `{name}`, `{url}`, `{tags}`. |
@@ -55,7 +57,7 @@ Campo opzionale: `hintImage`.
 | `id` | string | Unico, minuscolo `[a-z0-9_]`, 1-100 caratteri. Formato suggerito: slug della tappa, eventualmente con suffisso (`questname_timestamp`, es. `statua_regina_1234567890`). Non richiede prefisso per tipo. |
 | `name` | `{ it, en }` | Nome evocativo della tappa. |
 | `subtitle` | `{ it, en }` | Frase breve e misteriosa. |
-| `lat` / `lng` | number | Posizione reale della tappa a Bordighera. |
+| `lat` / `lng` | number | Posizione reale della tappa a Bordighera, **sempre presso un POI verificato** di `references/locations.json` (vedi `coordinates.md`). |
 | `description` | `{ it, en }` | Narrazione atmosferica + cosa fare. Per `photo`: "scatta una foto del..."; per `word`: la domanda precisa. |
 | `hint` | `{ it, en }` | Indizio enigmatico, senza rivelare la risposta. |
 | `icon` | string | Sempre `"quest"`. |
@@ -79,7 +81,7 @@ quelli comuni.
 | Campo | Tipo | Regole |
 | --- | --- | --- |
 | `speed` | number | Velocità del bersaglio, valori realistici 2-4. |
-| `waypoints` | array&lt;[lat, lng]&gt; | Almeno 5 coppie di coordinate che formano il percorso di pattuglia, tutte nella zona giocabile di Bordighera. Vedi `coordinates.md`. |
+| `waypoints` | array&lt;[lat, lng]&gt; | Almeno 5 coppie di coordinate che formano il percorso di pattuglia, che deve seguire una **polilinea verificata** di `references/locations.json` (distanza tra waypoint di poche decine di metri). Vedi `coordinates.md`. |
 
 ## Regole di formato dell'output
 

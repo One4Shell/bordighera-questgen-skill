@@ -42,10 +42,18 @@ Prima di scrivere qualunque JSON, consulta in ordine:
    per struttura, ordine dei campi, tipi e stile. L'output deve rispettarne
    esattamente la forma (ridotto a 3 tappe solo per brevità: il tuo output
    ne avrà sempre 5).
-3. `references/coordinates.md` — i vincoli geografici su Bordighera, sulla
+3. `references/locations.json` — **il database dei luoghi verificati** di
+   Bordighera (POI con coordinate reali e polilinee di strade reali per i
+   `moving`). **È l'unica fonte ammessa per le coordinate.** Mai inventare
+   lat/lng.
+4. `references/history.md` — **le storie verificate** di Bordighera con le
+   fonti. È l'unica fonte ammessa per i fatti storici: mai inventare date,
+   biografie o eventi.
+5. `references/coordinates.md` — i vincoli geografici su Bordighera, sulla
    distanza tra le tappe e sui waypoint dei bersagli `moving`.
-4. `references/style-guide.md` — le regole di tono, narrativa e struttura in
-   5 tappe (introduzione → sviluppo → climax → conclusione).
+6. `references/style-guide.md` — le regole di tono, narrativa e struttura in
+   5 tappe (introduzione → sviluppo → climax → conclusione), in stile
+   "caccia al segreto della città".
 
 ## Contratto di output (non negoziabile)
 
@@ -77,34 +85,43 @@ non deve necessariamente essere photo-word-word-moving-moving):
 ## Processo di generazione
 
 1. Leggi il testo di input fornito dall'utente (delimitato tra `<<<<` e
-   `>>>>`, se presente). Se manca, è vago o insufficiente, inventa in modo
-   coerente estendendo il tema — ma mantieni sempre la struttura 1 photo + 2
-   word + 2 moving.
-2. Individua il filo narrativo che collega il tema al percorso reale a
-   Bordighera: introduzione (accettazione quest) → sviluppo (prime 2-3
-   tappe) → climax (tappa più intensa, spesso una `moving`) → conclusione
-   (ultima tappa, spesso quella che sblocca il premio).
+   `>>>>`, se presente). Se manca, è vago o insufficiente, estendilo in modo
+   coerente **ancorandolo alle storie verificate di `references/history.md`**
+   — ma mantieni sempre la struttura 1 photo + 2 word + 2 moving.
+2. Individua nella storia scelta (max 2 storie combinate) il filo narrativo
+   che collega il tema al percorso reale a Bordighera: introduzione
+   (accettazione quest) → sviluppo (prime 2-3 tappe) → **climax** (tappa più
+   intensa, spesso una `moving`) → conclusione (ultima tappa, spesso quella
+   che sblocca il premio). Costruisci la **cornice misteriosa** ("il segreto
+   della città") attorno a fatti e luoghi veri.
 3. Scegli uno sponsor coerente e un premio plausibile, coerenti con il tono
-   della storia.
-4. Genera coordinate reali e plausibili per Bordighera seguendo
-   `references/coordinates.md`: la master e le 5 tappe non devono coincidere
-   nello stesso punto, e il percorso complessivo deve essere percorribile a
-   piedi in 15-40 minuti.
+   della storia. `reward.price` è opzionale (assente/`0` = non acquistabile);
+   il campo `sponsorPin` **non esiste**.
+4. Scegli le coordinate **solo dal database `references/locations.json`**,
+   seguendo `references/coordinates.md`: prendi i POI reali per
+   `start`/`end` e per le tappe `photo`/`word` (mai lo stesso POI due volte),
+   e una polilinea verificata (`lungomare_argentina`, `rotonda_sant_ampelio`,
+   `banchina_schiavi_del_mare`, `via_romana`, `borgo_antico`) per i waypoint
+   `moving`. Il percorso complessivo deve essere percorribile a piedi in
+   15-40 minuti.
 5. Scrivi i testi (`name`, `subtitle`, `description`, `hint`) sia in italiano
-   sia in inglese, seguendo `references/style-guide.md` per tono e
-   lunghezza.
+   sia in inglese, seguendo `references/style-guide.md` per tono (stile
+   mistero/"caccia al segreto") e lunghezza. Le domande `word` devono avere
+   risposta osservabile sul posto o derivabile dalla `description`/`hint`.
 6. Componi il JSON finale seguendo `references/schema.md` e
    `references/example-output.md` campo per campo.
-7. Prima di scrivere il file, verifica mentalmente (o con
-   `scripts/validate.py`, se hai accesso a un interprete Python) che:
+7. Prima di scrivere il file, verifica con `scripts/validate.py` (se hai
+   accesso a un interprete Python) oppure mentalmente che:
    - ci siano esattamente 5 sotto-quest con la composizione 1/2/2 corretta;
    - tutti gli `id` siano unici, minuscoli, `[a-z0-9_]`;
    - ogni tappa `word` abbia `answers` con più varianti reali, tutte
      minuscole e senza punteggiatura;
    - ogni tappa `moving` abbia `speed` tra 2 e 4 e almeno 5 waypoint
-     `[lat, lng]` coerenti con un percorso reale a Bordighera;
-   - tutte le lat/lng rientrino nell'area di gioco definita in
-     `references/coordinates.md`;
+     `[lat, lng]` che seguono una polilinea di `locations.json`;
+   - **tutte** le lat/lng (start, end, tappe, waypoint) siano **presso un
+     POI o una polilinea verificata** di `locations.json` e rientrino
+     nell'area di gioco di `references/coordinates.md`;
+   - i fatti storici citati nei testi siano presenti in `references/history.md`;
    - non manchi nessun campo obbligatorio dello schema.
 8. Scrivi il JSON validato nel file **`masterquest.json`** nella cartella
    corrente di lavoro, come unico contenuto del file. Conferma in chat solo
@@ -116,5 +133,7 @@ non deve necessariamente essere photo-word-word-moving-moving):
 Se l'utente incolla un output già generato e chiede una verifica, usa
 `scripts/validate.py` (se disponibile un interprete Python) oppure applica
 manualmente i controlli del punto 7 sopra, poi riporta in modo sintetico gli
-eventuali errori di schema, senza riscrivere l'intero JSON a meno che non ti
-venga chiesto esplicitamente di correggerlo.
+eventuali errori di schema **e di posizione** (tappe non vicino a un POI
+verificato di `locations.json`, waypoint `moving` lontani dalle polilinee
+verificate), senza riscrivere l'intero JSON a meno che non ti venga chiesto
+esplicitamente di correggerlo.
